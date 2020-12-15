@@ -1,3 +1,53 @@
 https://www.portfoliovisualizer.com/
 
 https://hyunyulhenry.github.io/quant_cookbook/
+
+
+
+ 'VT', # 전세계 
+'LTPZ', # 미국물가연동채 
+'VCLT', # 회사채
+ 'VWOB', # 이머칭채권 
+'BCI', # 원자재
+            
+=====================================
+
+library(quantmod)
+library(PerformanceAnalytics)
+library(magrittr)
+
+symbols = c('QQQ', # 미국 주식
+            'VT', # 유럽 주식 
+            'EDV', # 일본 주식
+            'LTPZ', # 이머징 주식
+            'TLT', # 미국 장기채
+            'IEF', # 미국 중기채
+            'VCLT', # 미국 리츠
+            'VWOB', # 글로벌 리츠
+            'IAU', # 금
+            'BCI'  # 상품
+
+            )
+getSymbols(symbols, src = 'yahoo')
+
+##  [1] "SPY" "IEV" "EWJ" "EEM" "TLT" "IEF" "IYR" "RWX"
+##  [9] "GLD" "DBC"
+
+prices = do.call(cbind,
+                 lapply(symbols, function(x) Ad(get(x)))) %>%
+  setNames(symbols)
+
+rets = Return.calculate(prices) %>% na.omit()
+
+
+library(tidyr)
+library(dplyr)
+library(corrplot)
+
+cor(rets) %>%
+  corrplot(method = 'color', type = 'upper',
+           addCoef.col = 'black', number.cex = 0.7,
+           tl.cex = 0.6, tl.srt=45, tl.col = 'black',
+           col =
+             colorRampPalette(c('blue', 'white', 'red'))(200),
+           mar = c(0,0,0.5,0))
